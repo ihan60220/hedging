@@ -1,0 +1,9 @@
+Tennis Matches: 
+  Davis Cup
+    Nicolas Mejia vs. Dan Evans Set 3 +105 -135 Hp = 5.86%
+    Rafael Salam vs. Chak Wong Set 2 +2000 -25000 Hp = 4.18%
+    Ajeet Rai vs. Alexander Lazarov Not Started +225 -315 = 6.26%
+  Challenger - Cleveland Open, Doubles
+    Galloway/Verdugo vs. Chappell/Michelsen Not Started -400 +275 = 6.25%
+  Notes:
+    - Tennis matches seem to hold between 4-7%. This allows for an implied probability volatility swing of equal size. 
