@@ -1,4 +1,5 @@
 import time
+import datetime
 #Algorithm to find strike position
 oddsA = 0#Static, found through Selenium driver#
 oddsB = 0#Dynamic, found through Selenium driver#
@@ -25,6 +26,7 @@ def commitSideBbet():
 
 determinesidepayout(oddsA, payoutA, stakeA) #Upon locked in stakeA
 
+
 def determinestakeB():
     fullstakeB = payoutA - stakeA
     lamestakeB = (.5 * fullstakeB) - (.5 * stakeA) + stakeA 
@@ -35,6 +37,10 @@ def determinestakeB():
     if (TruepayoutB - stakeB - stakeA) > 0) and (Derivativecheck = False):#Get Paul to fix this if statement
         commitSideBbet(stakeB)
         print("The value of this hedge is: " + str(TruepayoutB - stakeB - stakeA))
+        hedgelog = open("closedpositionslog.txt")
+        x = datetime.datetime.now()
+        hedgelog.write(nameA + " vs. " + nameB + x.strftime("%c") + "   Total Leveraged: " + str(stakeA + stakeB) + "   Payout:"+ str(TruepayoutB - stakeB - stakeA))
+        hedgelog.close()
         del oddsBlist[:]
     else:
         pass
