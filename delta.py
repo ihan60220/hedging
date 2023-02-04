@@ -87,7 +87,7 @@ while True:
         makeABet(stakeB)
         hedgelog = open("closedpositionslog.txt","a")
         currTime = datetime.now()
-        hedgelog.write(nameA + " vs. " + nameB + currTime.strftime("%c") + "   Total Leveraged: " + str(stakeA + stakeB) + "   Payout:"+ str(TruePayoutB - stakeB - stakeA))
+        hedgelog.write(nameA + " vs. " + nameB + currTime.strftime("%c") + "   Total Leveraged: " + str(stakeA + stakeB) + "   Payout:"+ str(TruePayoutB - stakeB - stakeA) + '\n')
         hedgelog.close()
         del oddsBlist[:]
         break
