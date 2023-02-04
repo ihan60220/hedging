@@ -7,3 +7,6 @@ Tennis Matches:
     Galloway/Verdugo vs. Chappell/Michelsen Not Started -400 +275 = 6.25%
   Notes:
     - Tennis matches seem to hold between 4-7%. This allows for an implied probability volatility swing of equal size. 
+Bovada username and password:
+  dar58965@gmail.com
+  Lpgg3586Rnbx5455
