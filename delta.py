@@ -1,5 +1,5 @@
 # delta hedging applied to sports betting
-
+import os
 import time
 from datetime import datetime
 from selenium import webdriver
@@ -13,7 +13,7 @@ def determine_sidepayout(odds, stake):
         return (100 / -odds) * stake + stake
 
 def isDuplicate(odds, oddslist):
-    if oddslist == []:
+    if len(oddslist) < 2:
         oddslist.append(odds)
     elif odds != oddslist[-1]:
         return False
@@ -38,6 +38,11 @@ def American_to_Decimal(odds):
 def determinestakeB(oddsA, stakeA, oddsB):
     return stakeA * (American_to_Decimal(oddsA) + 1) / (American_to_Decimal(oddsB) + 1)
 
+def makeABet(stakeB):
+    make_bet = driver.find_element(By.XPATH, '//*[@id="default-input--risk"]')
+    make_bet.send_key(str(stakeB))
+    make_bet = driver.find_element(By.XPATH, '/html/body/bx-site/ng-component/div/sp-sports-ui/div/main/section/div/div/sp-betslip-area/article/sp-betslip/div/div[2]/footer/button')
+    make_bet.click()
 
 # gets rid of some annoying console logs
 options = webdriver.ChromeOptions()
@@ -49,57 +54,39 @@ driver.get("https://www.bovada.lv/?overlay=login")
 # user should get everything set up before proceeding
 input("Press Enter When Done With Setup: ")
 
-stakeA = 1.50   #Can either be prompted input or detected from Selenium driver#
+#global variables for david
+nameA = input("Enter team A name: ")#Can be replaced with a Selenium path later
+oddsA = input("Enter odds for A: ")#Can be replaced with a Selenium path later
+oddsA = int(oddsA)
+stakeA = 1  #Can either be prompted input or detected from Selenium driver
 stakeB = 0
-payoutA = 0
-TruepayoutB = 0
 oddsBlist = []
-timelist = []
-dx = []
-dydx = 0
 
-for t in range(5):
-    # loop every ten seconds
-    time.sleep(10)
+while True:
+    # loop every 4 seconds
+    time.sleep(4)
     
     # fetch the bet slip
-    bet_slip = driver.find_elements(By.CLASS_NAME, "top-line")
-    teamA = bet_slip[0].find_elements(By.TAG_NAME, "span")
-    teamB = bet_slip[1].find_elements(By.TAG_NAME, "span")
-    nameA = teamA[0].text
+    bet_slip = driver.find_element(By.CLASS_NAME, "top-line")
+    teamB = bet_slip.find_elements(By.TAG_NAME, "span")
     nameB = teamB[0].text
-    oddsA = int(teamA[1].text)
     oddsB = int(teamB[1].text)
-
-    # print the data from bet slip
-    print(datetime.now(), nameA, oddsA, nameB, oddsB)
 
     if isDuplicate() == True:
         continue
 
-    determine_sidepayout(oddsA, stakeA) #Upon locked in stakeA
     stakeB = determinestakeB(oddsA, stakeA, oddsB)
     TruePayoutB = determine_sidepayout(oddsB, stakeB)
 
-    if TruePayoutB - stakeB - stakeA > 0 and derivativefinder(oddsB, oddsBlist):
-        # commitSideBbet(stakeB)
-        hedgelog = open("closedpositionslog.txt")
+    if TruePayoutB - stakeB - stakeA > 0 and derivativefinder(oddsBlist):
+        makeABet(stakeB)
+        hedgelog = open("closedpositionslog.txt","a")
         x = datetime.datetime.now()
-        hedgelog.write(nameA + " vs. " + nameB + x.strftime("%c") + "   Total Leveraged: " + str(stakeA + stakeB) + "   Payout:"+ str(TruepayoutB - stakeB - stakeA))
+        hedgelog.write(nameA + " vs. " + nameB + x.strftime("%c") + "   Total Leveraged: " + str(stakeA + stakeB) + "   Payout:"+ str(TruePayoutB - stakeB - stakeA))
         hedgelog.close()
         del oddsBlist[:]
+        break
 
 driver.quit()
 
-"""
-    make_bets = driver.find_elements(By.ID, "default-input--risk")
-    bet_on_A = make_bets[0].send_keys("0.5")
-    bet_on_B = make_bets[1].send_keys("0.5")
-    place_bets = driver.find_element(By.CLASS_NAME, "betslip-btn-container")
-    place_bets = place_bets.find_element(By.TAG_NAME, "button")
-    place_bets.click()
-"""
-
-#commit Side Bet tries
-continue_betting_btn = driver.find_element(By.CLASS_NAME, "continue-betting custom-cta primary cta-large")
-continue_betting_btn.click()
+#end of program
