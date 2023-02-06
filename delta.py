@@ -11,6 +11,8 @@ def determine_sidepayout(odds, stake):
         return odds * (stake / 100) + stake
     elif odds < 0:
         return (100 / -odds) * stake + stake
+    elif odds == "EVEN" or odds == "even":
+        return 2 * stake
 
 def isDuplicate(odds, oddslist):
     if len(oddslist) < 2:
@@ -29,11 +31,14 @@ def derivativefinder(oddslist):
     elif dydx < 0:
         return False
 
+#Results in a value that is not total payout, but amount won
 def American_to_Decimal(odds):
     if odds > 0:
         return odds / 100
     elif odds < 0:
         return 100 / -odds
+    elif odds == "EVEN" or odds == "even":
+        return 1
 
 def determinestakeB(oddsA, stakeA, oddsB):
     return stakeA * (American_to_Decimal(oddsA) + 1) / (American_to_Decimal(oddsB) + 1)
@@ -50,6 +55,7 @@ options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome(options=options)
 
 driver.get("https://www.bovada.lv/?overlay=login")
+
 
 # user should get everything set up before proceeding
 input("Press Enter When Done With Setup: ")
@@ -85,9 +91,13 @@ while True:
 
     if TruePayoutB - stakeB - stakeA > 0 and derivativefinder(oddsBlist):
         makeABet(stakeB)
-        hedgelog = open("closedpositionslog.txt","a")
+
+        #Produces log
         currTime = datetime.now()
-        hedgelog.write(nameA + " vs. " + nameB + currTime.strftime("%c") + "   Total Leveraged: " + str(stakeA + stakeB) + "   Payout:"+ str(TruePayoutB - stakeB - stakeA) + '\n')
+        file_path = os.path.join(os.path.expanduser("~"), "Downloads", "hedgelog.txt")
+        with open(file_path, "a") as hedgelog:
+            hedgelog.write(nameA + " vs. " + nameB + currTime.strftime("%c") + "   Total Leveraged: " + str(stakeA + stakeB) + "   Payout:"+ str(TruePayoutB - stakeB - stakeA)+ '\n')
+        
         hedgelog.close()
         del oddsBlist[:]
         break
@@ -100,3 +110,4 @@ time.sleep(60)
 driver.quit()
 
 #end of program
+
