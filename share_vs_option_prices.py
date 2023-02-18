@@ -16,10 +16,16 @@ while True:
         data_points += 1
 
 shares = np.array(shares)
-options = shares / delta    # shares = options * delta
+options = []
+for index, share in enumerate(shares):
+    if index == 0:
+        options.append(shares[0])
+    else:
+        options.append((shares[index] - shares[index - 1]) * delta + options[index - 1])
+
 time = np.linspace(0, data_points - 1, num=data_points)
-plt.plot(time, shares, label="shares")
-plt.plot(time, options, label="options")
+plt.plot(time, shares, label="Shares")
+plt.plot(time, options, label="Options")
 plt.xlabel("Time")
 plt.ylabel("Price")
 plt.legend()
