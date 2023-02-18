@@ -103,7 +103,6 @@ def calculate_volatility(asset_price: list[float]):
     return log_returns.std() * np.sqrt(len(asset_price))
 
 
-# calculate call price using black scholes
 def black_scholes(S: float, K: float, r: float, v: float, t:float, T:float):
     """
     Calculates the optimal call price using the Black-Scholes
@@ -113,30 +112,6 @@ def black_scholes(S: float, K: float, r: float, v: float, t:float, T:float):
     d2 = d1 - v * math.sqrt(T - t)
 
     return norm.cdf(d1) * S - norm.cdf(d2) * K * math.exp(-r * (T - t))
-
-
-def find_expected_values(S, K, r, v, time_to_expiration_range):
-    """
-    Calculate expected value for a range of time to expiration
-    """
-    call_prices = []
-
-    for t in time_to_expiration_range:
-        call_price = black_scholes(S, K, r, v, t, 1)
-        call_prices.append(call_price)
-    
-    return call_prices
-
-
-def plot_expected_value(time_to_expiration_range, expected_values):
-    """
-    Plot expected value as a function of time to expiration
-    """
-    plt.plot(time_to_expiration_range, expected_values)
-    plt.xlabel('Time to expiration')
-    plt.ylabel('Expected value')
-    plt.show()
-
 
 
 """
@@ -160,8 +135,8 @@ nameA = input("Enter team A name: ")#Can be replaced with a Selenium path later
 oddsA = int(input("Enter odds for A: "))#Can be replaced with a Selenium path later
 stakeA = round(float(input("Enter stakeA: ")), 2)  #Can either be prompted input or detected from Selenium driver
 stakeB = 0
-oddsBlist = []
-
+oddsB_list = []
+PayoutB_list = []
 
 while True:
     # loop every 4 seconds
@@ -174,9 +149,10 @@ while True:
     oddsB = int(teamB[1].text)
 
     print(oddsB)
+    PayoutB_list.append(oddsB)
 
     # if no change in odds, skip the code below
-    if isDuplicate(oddsB, oddsBlist):
+    if isDuplicate(oddsB, oddsB_list):
         print("No change.")
         continue
 
@@ -187,20 +163,28 @@ while True:
     if stakeB > 5:
         continue
 
-    TruePayoutB = determine_payout(oddsB, stakeB)
+    # t = find time elapsed via selenium
+    volatility = calculate_volatility(PayoutB_list)
+    PayoutB = determine_payout(oddsB, stakeB)
+    optimal_price = black_scholes(PayoutB, PayoutB, 0.05, volatility, 0, 1)
 
-    if TruePayoutB - stakeA > 0 and derivativefinder(oddsBlist):
+    # if stakeB is less than the optimal price, do not execute the hedge
+    if stakeB < optimal_price:
+        continue
+
+
+    if PayoutB - stakeA > 0 and derivativefinder(oddsB_list):
         makeABet(stakeB)
         hedgelog = open("closedpositionslog.txt","a")
         currTime = datetime.now()
         hedgelog.write(nameA + " vs. " + nameB + currTime.strftime("%c") + 
                        "   Total Leveraged: " + str(stakeA + stakeB) + 
-                       "   Payout:"+ str(TruePayoutB - stakeB - stakeA) + "\n")
+                       "   Payout:"+ str(PayoutB - stakeB - stakeA) + "\n")
         hedgelog.close()
-        del oddsBlist[:]
+        del oddsB_list[:]
         break
     else:
-        print(str(TruePayoutB - stakeB - stakeA))
+        print(str(PayoutB - stakeB - stakeA))
 
 
 time.sleep(60)
