@@ -1,1 +1,1 @@
-# We gon be rich
+using delta hedging to hedge sports bets
