@@ -103,10 +103,10 @@ PayoutB_list = []
 
 while True:
     nameB = "Team B"
-    oddsB = float(input("Enter the oddsB: "))
+    oddsB = float(input("Enter oddsB: "))
 
     if oddsB == 0:
-        print("terminating")
+        print("terminating.")
         break
 
     print(oddsB)
@@ -115,7 +115,7 @@ while True:
 
     # if no change in odds, skip the code below
     if isDuplicate(oddsB, oddsB_list):
-        print("No change in oddsB.")
+        print("no change in oddsB.")
         continue
 
     stakeB = determine_StakeB(oddsA, stakeA, oddsB)
@@ -133,7 +133,18 @@ while True:
     if optimal_price < 1:
         continue
 
-    if PayoutB - stakeA > 0 and derivativefinder(oddsB_list):
-        print("bet executed, net return =", PayoutB - stakeA)
+    hedged = False
+
+    if PayoutB - stakeA > 0 and not derivativefinder(oddsB_list):
+        print("bet executed.")
+        hedged = True
+        
     else:
-        print("not executed, net return =", PayoutB - stakeA)
+        print("no hedge.")
+    
+    print("net return:", PayoutB - stakeA)
+    print("percent return:", int(100 * (PayoutB - stakeA) / (stakeA + stakeB)), "%")
+
+    if hedged:
+        print("terminating.")
+        break
