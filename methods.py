@@ -81,7 +81,9 @@ def run_hedge(driver: webdriver):
     stakeA = round(float(input("Enter stakeA: ")), 2)  #Can either be prompted input or detected from Selenium driver
     stakeB = 0
     oddsB_list = []
-    PayoutB_list = []
+
+    # show the range of odds that will make hedging successful
+    print("oddsB will need to be greater than:", -oddsA)
 
     while True:
         # loop every 4 seconds
@@ -94,7 +96,6 @@ def run_hedge(driver: webdriver):
         oddsB = int(teamB[1].text)
 
         print(oddsB)
-        PayoutB_list.append(oddsB)
 
         # if no change in odds, skip the code below
         if isDuplicate(oddsB, oddsB_list):
