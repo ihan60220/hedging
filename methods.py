@@ -66,7 +66,7 @@ def startup():
 
     # load bovada
     driver.get("https://www.bovada.lv/?overlay=login")
-    login_to_bovada("dar58965@gmail.com", "Lpgg3586Rnbx5455")
+    login_to_bovada("dar58965@gmail.com", "Lpgg3586Rnbx5455", driver)
 
     # user should get everything set up before proceeding
     input("Press Enter When Done With Setup: ")
@@ -111,14 +111,6 @@ def run_hedge(driver: webdriver):
             print("negative hedge amount:", hedge_amount)
             continue
 
-        # calculate percent return:
-        leveraged = stakeA + stakeB
-        percent_return = PayoutB / leveraged
-
-        # if percent return too low, don't hedge we can do better
-        if percent_return < 0.20:
-            print("low percent return:", percent_return)
-            continue
 
         if derivativefinder(oddsB_list):
             makeABet(stakeB, driver)
@@ -126,6 +118,6 @@ def run_hedge(driver: webdriver):
             currTime = datetime.now()
             hedgelog.write(nameA + " vs. " + nameB + currTime.strftime("%c") + 
                         "   Total Leveraged: " + str(stakeA + stakeB) + 
-                        "   Payout:"+ str(PayoutB - stakeB - stakeA) + "\n")
+                        "   Payout:"+ str(PayoutB - stakeA) + "\n")
             hedgelog.close()
             break
