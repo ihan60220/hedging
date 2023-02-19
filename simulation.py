@@ -105,6 +105,10 @@ while True:
     nameB = "Team B"
     oddsB = float(input("Enter the oddsB: "))
 
+    if oddsB == 0:
+        print("terminating")
+        break
+
     print(oddsB)
     PayoutB_list.append(American_to_Decimal(oddsB))
     print(PayoutB_list)
@@ -125,8 +129,8 @@ while True:
     optimal_price = black_scholes(PayoutB, PayoutB, 0.05, volatility, 0, 1/365)
     print("optimal price:", optimal_price)
 
-    # if stakeB is less than the optimal price, do not execute the hedge
-    if stakeB > optimal_price:
+    # if optimal price is less than a dollar, not worth doing
+    if optimal_price < 1:
         continue
 
     if PayoutB - stakeA > 0 and derivativefinder(oddsB_list):
