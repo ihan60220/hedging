@@ -68,7 +68,7 @@ def calculate_volatility(asset_price: list[float]):
     """
     if len(asset_price) < 2:
         print("too few data points.")
-        return 0.1
+        return 0
     
     returns = np.roll(asset_price, -1) / asset_price
     returns = returns[:-1] 
@@ -82,8 +82,13 @@ def black_scholes(S: float, K: float, r: float, v: float, t:float, T:float):
     Calculates the optimal call price using the Black-Scholes
     formula given the necessary parameters
     """
-    d1 = 1/(v * np.sqrt(T)) * (math.log(S / K) + (r + v**2 / 2) * (T - t))
-    d2 = d1 - v * math.sqrt(T - t)
+    if v == 0:
+        # in the case where price is constant, the option value has no ext value
+
+        return S - K * math.exp(-r * (T - t))
+    else :
+        d1 = 1/(v * np.sqrt(T)) * (math.log(S / K) + (r + v**2 / 2) * (T - t))
+        d2 = d1 - v * math.sqrt(T - t)
 
     return norm.cdf(d1) * S - norm.cdf(d2) * K * math.exp(-r * (T - t))
 
@@ -101,7 +106,8 @@ while True:
     oddsB = float(input("Enter the oddsB: "))
 
     print(oddsB)
-    PayoutB_list.append(oddsB)
+    PayoutB_list.append(American_to_Decimal(oddsB))
+    print(PayoutB_list)
 
     # if no change in odds, skip the code below
     if isDuplicate(oddsB, oddsB_list):
@@ -120,10 +126,10 @@ while True:
     print("optimal price:", optimal_price)
 
     # if stakeB is less than the optimal price, do not execute the hedge
-    if stakeB < optimal_price:
+    if stakeB > optimal_price:
         continue
 
     if PayoutB - stakeA > 0 and derivativefinder(oddsB_list):
-        print("bet executed")
+        print("bet executed, net return =", PayoutB - stakeA)
     else:
-        print("not executed, net return =", str(PayoutB - stakeB - stakeA))
+        print("not executed, net return =", PayoutB - stakeA)
