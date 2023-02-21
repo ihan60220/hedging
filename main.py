@@ -23,6 +23,7 @@ def login_to_bovada(username, password):
     fill_out = driver.find_element(By.XPATH, '//*[@id="login-password"]')
     fill_out.send_keys(password)
     fill_out = driver.find_element(By.XPATH, '//*[@id="login-submit"]')
+    time.sleep(.2)
     fill_out.click()
 
 
